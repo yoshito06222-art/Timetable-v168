@@ -10,7 +10,8 @@
 <title>Timetable</title>
 <style>
 :root{
-  --bg:#fafafa;--sur:#fff;--sur2:#f0f0f0;--brd:#e0e0e0;
+  --sab:env(safe-area-inset-bottom, 0px);
+}
   --acc:#222;--acc2:#555;--txt:#111;--mut:#888;
   --red:#e53935;--grn:#43a047;--yel:#f9a825;--ora:#fb923c;
 }
@@ -25,11 +26,12 @@
 .th-classic{--bg:#23272a;--sur:#2c2f33;--sur2:#36393f;--brd:#202225;--acc:#7289da;--acc2:#faa61a;--txt:#fff;--mut:#99aab5}
 .th-canary{--bg:#36393f;--sur:#40444b;--sur2:#2f3136;--brd:#202225;--acc:#7289da;--acc2:#43b581;--txt:#dcddde;--mut:#8e9297}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
+html{height:100%;background:#000}
 body{
   background:var(--bg);color:var(--txt);
   font-family:-apple-system,'Helvetica Neue',sans-serif;
   display:flex;flex-direction:column;
+  height:100%;
   padding-left:env(safe-area-inset-left);
   padding-right:env(safe-area-inset-right);
 }
@@ -64,7 +66,7 @@ body{
   display:flex;align-items:center;justify-content:center;cursor:pointer}
 .wnav-btn:active{background:var(--sur2)}
 /* cal grid */
-.cal-outer{flex:1;overflow:hidden;padding:4px 8px 0}
+.cal-outer{flex:1;overflow:hidden;padding:4px 8px env(safe-area-inset-bottom)}
 .cal{display:grid;grid-template-columns:42px repeat(6,1fr);gap:3px;height:100%}
 .cal-hd{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 0}
 .cal-hd-day{font-size:10px;font-weight:700;color:var(--mut);line-height:1.3}
@@ -615,10 +617,11 @@ function renderCal(){
   const grid=document.getElementById('cal-grid');
   grid.innerHTML='';
 
-  // 行高さ計算
+  // 行高さ計算（safe-area-inset-bottomを考慮）
   const outer=document.getElementById('cal-outer');
+  const safeBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab') || '0') || 0;
   const HEAD=44;
-  const ch=Math.max(52, Math.floor((outer.clientHeight-8-HEAD-4*3)/5));
+  const ch=Math.max(52, Math.floor((outer.clientHeight-8-HEAD-4*3-safeBottom)/5));
   grid.style.gridTemplateRows=`${HEAD}px repeat(5,${ch}px)`;
   grid.style.gridTemplateColumns='42px repeat(6,1fr)';
 
