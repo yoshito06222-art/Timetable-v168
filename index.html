@@ -1,6 +1,4 @@
-/* ボトムシート（下から出るモーダル）*/
-.ov:not(.mid){padding-bottom:0}
-.modal:not(.mid-modal){border-radius:18px 18px 0 0;padding-bottom:max(24px,env(safe-area-inset-bottom))}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -54,9 +52,9 @@ body{
 #vcal{display:flex;flex-direction:column;flex:1;overflow:hidden}
 .banners{padding:5px 10px 3px;display:flex;flex-wrap:wrap;gap:4px;flex-shrink:0}
 .chip{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
-.chip-q{background:rgba(88,101,242,.15);color:var(--acc)}
-.chip-s{background:rgba(67,160,71,.15);color:var(--grn)}
-.chip-h{background:rgba(249,168,37,.18);color:var(--yel)}
+.chip-q{background:rgba(var(--acc-rgb),.18);color:var(--acc)}
+.chip-s{background:rgba(var(--acc-rgb),.12);color:var(--acc)}
+.chip-h{background:rgba(var(--acc2-rgb),.2);color:var(--acc2)}
 .wnav{display:flex;align-items:center;justify-content:space-between;padding:5px 10px 3px;flex-shrink:0}
 .wnav-lbl{font-size:13px;color:var(--mut);font-weight:500;text-align:center;flex:1}
 .wnav-btn{background:var(--sur);border:1px solid var(--brd);color:var(--txt);
@@ -147,19 +145,13 @@ body{
 .sh-btn.acc{background:var(--acc);color:#fff}
 .sh-cancel{background:none;border:none;color:var(--mut);border-radius:10px;
   padding:12px;font-size:15px;cursor:pointer;width:100%;text-align:center}
-.ov{
-  position:fixed;
-  top:-100px; left:-100px; right:-100px; bottom:-100px;
-  background:rgba(0,0,0,.7);
-  z-index:200;
-  display:flex;align-items:flex-end;justify-content:center;
-  padding:100px 100px calc(100px + env(safe-area-inset-bottom)) 100px;
-}
-.ov.mid{align-items:center;padding-bottom:100px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;
+  display:flex;align-items:flex-end;justify-content:center}
+.ov.mid{align-items:center}
 .modal{background:var(--sur);border-radius:18px 18px 0 0;width:100%;max-width:600px;
   max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:18px 14px 24px}
-.ov.mid .modal{border-radius:16px;margin:12px;max-height:86vh;width:calc(100% - 24px);align-self:center}
+  padding:18px 14px max(24px,env(safe-area-inset-bottom))}
+.ov.mid .modal{border-radius:16px;margin:12px;max-height:86vh;width:calc(100% - 24px);padding-bottom:24px;align-self:center}
 .drag{width:36px;height:4px;background:var(--brd);border-radius:2px;margin:0 auto 14px}
 .modal h2{font-size:17px;font-weight:700;margin-bottom:14px}
 .dsec{margin-bottom:14px}
@@ -517,16 +509,16 @@ function eventsFor(ds){ return D.events.filter(function(e){ return e.start<=ds&&
 // THEME
 // ═══════════════════════════════════════════
 const THEMES = [
-  {id:'minimal',  label:'Minimal',  bg:'#fafafa', acc:'#222222'},
-  {id:'slate',    label:'Slate',    bg:'#f0f2f5', acc:'#4f5ee8'},
-  {id:'pearl',    label:'Pearl',    bg:'#faf8f5', acc:'#b07a5a'},
-  {id:'fog',      label:'Fog',      bg:'#f2f4f7', acc:'#4a6a8a'},
-  {id:'ivory',    label:'Ivory',    bg:'#fdfbf5', acc:'#a07840'},
-  {id:'obsidian', label:'Obsidian', bg:'#0a0a0f', acc:'#3d9cf0'},
-  {id:'charcoal', label:'Charcoal', bg:'#1e2028', acc:'#4ecba8'},
-  {id:'midnite',  label:'Midnight', bg:'#0f1225', acc:'#9b7fe8'},
-  {id:'ash',      label:'Steel',    bg:'#141a24', acc:'#7ab8d8'},
-  {id:'onyx',     label:'Onyx',     bg:'#080808', acc:'#e82020'},
+  {id:'minimal',  label:'Minimal',  bg:'#fafafa', acc:'#222222', acc2:'#555555'},
+  {id:'slate',    label:'Slate',    bg:'#f0f2f5', acc:'#4f5ee8', acc2:'#7b89f0'},
+  {id:'pearl',    label:'Pearl',    bg:'#faf8f5', acc:'#b07a5a', acc2:'#c9967a'},
+  {id:'fog',      label:'Fog',      bg:'#f2f4f7', acc:'#4a6a8a', acc2:'#6a8aaa'},
+  {id:'ivory',    label:'Ivory',    bg:'#fdfbf5', acc:'#a07840', acc2:'#c09858'},
+  {id:'obsidian', label:'Obsidian', bg:'#0a0a0f', acc:'#3d9cf0', acc2:'#6ab8f7'},
+  {id:'charcoal', label:'Charcoal', bg:'#1e2028', acc:'#4ecba8', acc2:'#72dbbe'},
+  {id:'midnite',  label:'Midnight', bg:'#0f1225', acc:'#9b7fe8', acc2:'#b89df0'},
+  {id:'ash',      label:'Steel',    bg:'#141a24', acc:'#7ab8d8', acc2:'#a0d0e8'},
+  {id:'onyx',     label:'Onyx',     bg:'#080808', acc:'#e82020', acc2:'#f55050'},
 ];
 function hexToRgb(hex){
   const r=parseInt(hex.slice(1,3),16);
@@ -534,16 +526,23 @@ function hexToRgb(hex){
   const b=parseInt(hex.slice(5,7),16);
   return r+','+g+','+b;
 }
+function hexToRgba(hex, alpha){
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+alpha+')';
+}
 function applyTheme(id){
   document.body.className = 'th-'+id;
   D.theme = id; dbSave(); renderThemeGrid();
   const t = THEMES.find(function(x){ return x.id===id; }) || THEMES[0];
   document.getElementById('theme-color-meta').setAttribute('content', t.bg);
   document.documentElement.style.background = t.bg;
-  // アクセントカラーのRGB値をCSS変数にセット
-  document.documentElement.style.setProperty('--acc-rgb', hexToRgb(t.acc));
-  // acc2はCSSクラスから取得できないためaccと同系色で代用
-  document.documentElement.style.setProperty('--acc2-rgb', hexToRgb(t.acc));
+  document.documentElement.style.setProperty('--acc-rgb',  hexToRgb(t.acc));
+  document.documentElement.style.setProperty('--acc2-rgb', hexToRgb(t.acc2||t.acc));
+  // 休業期間コマの色を直接セット
+  document.documentElement.style.setProperty('--hol-bg',  hexToRgba(t.acc2||t.acc, 0.06));
+  document.documentElement.style.setProperty('--hol-brd', hexToRgba(t.acc2||t.acc, 0.2));
 }
 function renderThemeGrid(){
   document.getElementById('theme-grid').innerHTML = THEMES.map(function(t){
